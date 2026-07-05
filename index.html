@@ -35,11 +35,30 @@
         .time-cell { grid-column: 1; font-size: 11px; color: var(--text-secondary); font-weight: bold; text-align: center; border-right: 1px solid var(--border-color); border-bottom: 1px solid #cbd5e1; display: flex; align-items: flex-start; justify-content: center; padding-top: 4px; background: #f8fafc; }
         .empty-grid-cell { background: #ffffff; border-right: 1px solid #f1f5f9; border-bottom: none; }
         .hour-boundary { border-bottom: 1px solid #e2e8f0 !important; }
+        
+        /* 기존 셀 기본 스타일 (외부 마진 1px 2px 유지) */
         .box-item { border-radius: 6px; padding: 4px 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; border: 1px solid rgba(0,0,0,0.02); margin: 1px 2px; z-index: 10; }
         .box-title-row { display: flex; align-items: center; justify-content: center; gap: 2px; font-size: 10px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; }
         .box-time { font-size: 9px; font-weight: 600; margin-top: 2px; line-height: 1.1; text-align: center; display: flex; flex-direction: column; align-items: center; }
         .box-time span.end-time::before { content: '~ '; }
         
+        /* -------------------------------------------
+           [수정] 셀 내부 여백 줄이기 및 글자 가로 맞춤 스타일
+        ------------------------------------------- */
+        .compact-mode .box-item { 
+            padding: 2px 0px; /* 내부 상하 여백을 줄이고 좌우 여백을 없애서 좌우 공간 확보 */
+            /* margin: 1px 2px; -> 외부 스케줄 간격은 건드리지 않고 그대로 유지됩니다. */
+        }
+        .compact-mode .box-title-row { 
+            font-size: 11px; /* 글자 크기를 키워 칸에 가로로 꽉 차게 만듭니다. */
+            letter-spacing: -0.01em; /* 자간을 살짝 넓혀 가로 폭을 늘립니다. */
+        }
+        .compact-mode .box-time { 
+            font-size: 9.5px; /* 시간 글자 크기도 칸에 맞춰 키웁니다. */
+            margin-top: 0px; 
+            letter-spacing: -0.03em;
+        }
+
         .item-school { background-color: var(--bg-school); color: var(--text-school); }
         .item-taekwondo { background-color: var(--bg-taekwondo); color: var(--text-taekwondo); }
         .item-math { background-color: var(--bg-math); color: var(--text-math); }
@@ -62,16 +81,11 @@
         .card h3 { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
         .form-group-block { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; background: #f8fafc; padding: 8px; border-radius: 8px; border: 1px solid #f1f5f9; }
         
-        /* -------------------------------------------
-           [모바일 가로폭 짤림 해결] 정렬 레이아웃 전면 수정
-        ------------------------------------------- */
         .form-row-line { display: flex; align-items: center; font-size: 12px; width: 100%; gap: 4px; justify-content: space-between; }
         .form-row-line label { width: 36px; font-weight: 600; color: var(--text-secondary); flex-shrink: 0; }
         
-        /* 소요시간 및 시간 입력 컴포넌트 묶음 구조 최적화 */
         .duration-input { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--text-primary); flex: 1; justify-content: flex-end; width: 100%; }
 
-        /* 인풋 가로폭을 축소하여 모바일 화면 안으로 완전 가둠 */
         input[type="time"] { padding: 5px 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; color: var(--text-primary); width: 105px; text-align: center; background: #ffffff; outline: none; flex-shrink: 0; }
         input[type="time"]:focus { border-color: var(--text-secondary); }
         input[type="number"] { padding: 5px 2px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; width: 34px; text-align: center; background: #ffffff; outline: none; -webkit-appearance: none; margin: 0; -moz-appearance: textfield; flex-shrink: 0; }
@@ -92,7 +106,6 @@
         .close-x-btn { background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; padding: 4px; line-height: 1; }
     </style>
 </head>
-    
 <body>
     <div class="main-wrapper">
         <div class="scheduler-title">우리 딸 이번 주 스케줄</div>
@@ -105,6 +118,12 @@
             <div class="modal-header"><h2>시간표 세부 관리</h2><button class="close-x-btn" onclick="closeAdmin()">×</button></div>
             <div class="modal-body"><div class="card" id="school-card-container"></div><div id="academy-admin-container"></div></div>
             <div class="modal-footer">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 0 4px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">화면 보기 설정</span>
+                    <label class="custom-toggle" style="color: var(--text-primary); font-weight: 600;">
+                        <input type="checkbox" id="toggle-compact-mode"> 셀 내부 여백 줄이기 (글자 크게 맞춤)
+                    </label>
+                </div>
                 <button class="save-btn" onclick="saveData()">화면에 설정 즉시 반영하기</button>
                 <div class="file-action-row">
                     <button class="file-btn" onclick="exportDataJSON()">💾 내 컴퓨터에 백업 파일 다운로드</button>
@@ -114,8 +133,8 @@
         </div>
     </div>
     <script>
-        // 예비용 로컬 기본 데이터 구조
         const defaultFallbackData = {
+            "isCompact": false,
             "school": { "name": "학교", "icon": "🎒", "class": "item-school", "isCustom": true, "common": { "time": "09:00", "pHour": 4, "pMin": 40, "days": ["월", "화", "수", "목", "금"] }, "custom": { "월": { "time": "09:00", "h": 3, "m": 50 }, "화": { "time": "09:00", "h": 4, "m": 40 }, "수": { "time": "09:00", "h": 4, "m": 40 }, "목": { "time": "09:00", "h": 4, "m": 40 }, "금": { "time": "09:00", "h": 5, "m": 20 } } },
             "academies": {
                 "taekwondo": { "name": "태권도", "icon": "🥋", "class": "item-taekwondo", "isCustom": false, "common": { "time": "17:00", "pHour": 1, "pMin": 0, "days": ["월", "수", "금"] }, "custom": { "월": { "time": "17:00", "h": 1, "m": 0 }, "화": { "time": "", "h": 1, "m": 0 }, "수": { "time": "17:00", "h": 1, "m": 0 }, "목": { "time": "", "h": 1, "m": 0 }, "금": { "time": "17:00", "h": 1, "m": 0 } } },
@@ -129,7 +148,6 @@
         const STORAGE_KEY = 'daughter_schedule_v13';
         let currentData = defaultFallbackData;
 
-        // [핵심 강제 구조] 브라우저 저장소를 무시하고 무조건 서버의 txt 파일을 우선적으로 읽어오도록 순서 강제화
         async function loadServerData() {
             try {
                 const response = await fetch('daughter_schedule.txt?t=' + new Date().getTime());
@@ -162,7 +180,16 @@
             return `<div class="card-header-row"><h3><span>${targetObj.icon}</span><span>${targetObj.name} 설정</span></h3><label class="custom-toggle"><input type="checkbox" id="toggle-${key}" ${targetObj.isCustom ? "checked" : ""} onchange="toggleFormLayer('${key}')"> 요일별 개별 설정</label></div><div id="common-box-${key}" style="display: ${targetObj.isCustom ? "none" : "block"};"><div class="form-group-block"><div class="form-row-line"><label>시간/소요</label><div class="duration-input"><input type="time" id="time-${key}-common" value="${targetObj.common.time}"><input type="number" id="h-${key}-common" value="${targetObj.common.pHour}">시간<input type="number" id="m-${key}-common" value="${targetObj.common.pMin}">분</div></div></div><div class="form-group-block"><div class="form-row-line"><label>요일 선택</label><div class="checkbox-group">${checkboxesHtml}</div></div></div></div><div id="custom-box-${key}" style="display: ${targetObj.isCustom ? "block" : "none"};" class="custom-rows-container">${rowsHtml}</div>`;
         }
         
-        function buildAdminForm(){ document.getElementById('school-card-container').innerHTML = generateFormHtml('school', currentData.school); const container = document.getElementById('academy-admin-container'); container.innerHTML = ''; for(let t in currentData.academies){ let card = document.createElement('div'); card.className = 'card', card.innerHTML = generateFormHtml(t, currentData.academies[t]), container.appendChild(card); } }
+        function buildAdminForm(){ 
+            document.getElementById('school-card-container').innerHTML = generateFormHtml('school', currentData.school); 
+            const container = document.getElementById('academy-admin-container'); 
+            container.innerHTML = ''; 
+            for(let t in currentData.academies){ 
+                let card = document.createElement('div'); 
+                card.className = 'card', card.innerHTML = generateFormHtml(t, currentData.academies[t]), container.appendChild(card); 
+            }
+            document.getElementById('toggle-compact-mode').checked = currentData.isCompact || false;
+        }
         function toggleFormLayer(key){ let isChecked = document.getElementById('toggle-' + key).checked; document.getElementById('common-box-' + key).style.display = isChecked ? 'none' : 'block', document.getElementById('custom-box-' + key).style.display = isChecked ? 'block' : 'none'; }
         
         function pullFormData(key, targetObj){
@@ -178,12 +205,51 @@
             });
         }
         
-        function saveData(){ pullFormData('school', currentData.school); for (let key in currentData.academies) pullFormData(key, currentData.academies[key]); localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData)), closeAdmin(), renderSchedule(); }
-        function exportDataJSON(){ pullFormData('school', currentData.school); for (let key in currentData.academies) pullFormData(key, currentData.academies[key]); let dataStr = JSON.stringify(currentData, null, 4), blob = new Blob([dataStr], {type:"text/plain;charset=utf-8"}), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url, a.download = "daughter_schedule.txt", a.click(), URL.revokeObjectURL(url); }
-        function importDataJSON(e){ let file = e.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = function(evt){ try { let parsed = JSON.parse(evt.target.result); if (parsed.school && parsed.academies) { currentData = parsed; localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData)); alert("백업 설정을 정상적으로 불러왔습니다!"); buildAdminForm(); renderSchedule(); } else { alert("올바른 설정 파일 형식이 아닙니다."); } } catch(err){ alert("파일 파싱 실패."); } }, reader.readAsText(file); }
+        function saveData(){ 
+            currentData.isCompact = document.getElementById('toggle-compact-mode').checked;
+            pullFormData('school', currentData.school); 
+            for (let key in currentData.academies) pullFormData(key, currentData.academies[key]); 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData)), closeAdmin(), renderSchedule(); 
+        }
+        
+        function exportDataJSON(){ 
+            currentData.isCompact = document.getElementById('toggle-compact-mode').checked;
+            pullFormData('school', currentData.school); 
+            for (let key in currentData.academies) pullFormData(key, currentData.academies[key]); 
+            let dataStr = JSON.stringify(currentData, null, 4), blob = new Blob([dataStr], {type:"text/plain;charset=utf-8"}), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url, a.download = "daughter_schedule.txt", a.click(), URL.revokeObjectURL(url); 
+        }
+        
+        function importDataJSON(e){ 
+            let file = e.files[0]; 
+            if(!file) return; 
+            let reader = new FileReader(); 
+            reader.onload = function(evt){ 
+                try { 
+                    let parsed = JSON.parse(evt.target.result); 
+                    if (parsed.school && parsed.academies) { 
+                        currentData = parsed; 
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData)); 
+                        alert("백업 설정을 정상적으로 불러왔습니다!"); 
+                        buildAdminForm(); 
+                        renderSchedule(); 
+                    } else { 
+                        alert("올바른 설정 파일 형식이 아닙니다."); 
+                    } 
+                } catch(err){ alert("파일 파싱 실패."); } 
+            }, 
+            reader.readAsText(file); 
+        }
+        
         function getRowIndex(timeStr, baseHour){ let [hh, mm] = timeStr.split(':').map(Number), diff = 60 * hh + mm - 60 * baseHour; return diff < 0 ? 0 : Math.floor(diff / 10); }
         
         function renderSchedule(){
+            const mainWrapper = document.querySelector('.main-wrapper');
+            if(currentData.isCompact) {
+                mainWrapper.classList.add('compact-mode');
+            } else {
+                mainWrapper.classList.remove('compact-mode');
+            }
+
             const days = ['월','화','수','목','금']; let minHour = 9, maxHour = 17;
             days.forEach(day => {
                 let sch = currentData.school;
